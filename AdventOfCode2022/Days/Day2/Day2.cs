@@ -8,7 +8,6 @@ namespace AdventOfCode2022.Days
         {
             string[] lines = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOvCode2022\AdventOfCode2022\Days\Day2\Input.txt");
 
-            var matches = new List<int>();
             var totalScoreP1 = 0;
             var totalScoreP2 = 0;
 
