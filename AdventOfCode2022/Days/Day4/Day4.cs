@@ -4,7 +4,7 @@
     {
         public static void Run()
         {
-            string[] lines = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOvCode2022\AdventOfCode2022\Days\Day4\Input.txt");
+            string[] lines = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOfCode2022\AdventOfCode2022\Days\Day4\Input.txt");
 
             var completeOverlapCount = 0;
             var overlapCount = 0;

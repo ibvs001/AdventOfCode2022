@@ -4,9 +4,9 @@
     {
         public static void Run()
         {
-            string[] stacks = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOvCode2022\AdventOfCode2022\Days\Day5\Stacks.txt");
-            string[] orderedStacks = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOvCode2022\AdventOfCode2022\Days\Day5\Stacks.txt");
-            string[] lines = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOvCode2022\AdventOfCode2022\Days\Day5\Input.txt");
+            string[] stacks = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOfCode2022\AdventOfCode2022\Days\Day5\Stacks.txt");
+            string[] orderedStacks = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOfCode2022\AdventOfCode2022\Days\Day5\Stacks.txt");
+            string[] lines = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOfCode2022\AdventOfCode2022\Days\Day5\Input.txt");
 
             var stackOutput1 = string.Empty;
             var stackOutput2 = string.Empty;

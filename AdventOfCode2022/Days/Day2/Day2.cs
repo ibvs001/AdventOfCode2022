@@ -6,7 +6,7 @@ namespace AdventOfCode2022.Days
     {
         public static void Run()
         {
-            string[] lines = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOvCode2022\AdventOfCode2022\Days\Day2\Input.txt");
+            string[] lines = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOfCode2022\AdventOfCode2022\Days\Day2\Input.txt");
 
             var totalScoreP1 = 0;
             var totalScoreP2 = 0;

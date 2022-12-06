@@ -4,7 +4,7 @@
     {
         public static void Run()
         {
-            string[] lines = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOvCode2022\AdventOfCode2022\Days\Day3\Input.txt");
+            string[] lines = File.ReadAllLines(@"D:\Development\AdventOfCode\AdventOfCode2022\AdventOfCode2022\Days\Day3\Input.txt");
 
             var prioritySum = 0;
             var packPrioritySum = 0;
