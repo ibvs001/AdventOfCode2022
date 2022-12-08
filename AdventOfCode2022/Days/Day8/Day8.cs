@@ -9,8 +9,8 @@ namespace AdventOfCode2022.Days
     {
         static int year = 2022;
         static int day = 8;
-        //static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\Input.txt";
-        static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\SampleInput.txt";
+        static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\Input.txt";
+        //static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\SampleInput.txt";
         static string cookiePath = @"D:\Development\AdventOfCode\cookie.txt";
 
         static int part1 = -1;
@@ -129,95 +129,90 @@ namespace AdventOfCode2022.Days
 
             foreach (var tree in tallestTrees.Distinct())
             {
-                var right = 0;
+                //Console.WriteLine($"row: {tree.Item1}, column: {tree.Item2}, tree: {tree.Item3}");
 
-                for (int i = tree.Item1; i < lines[tree.Item1].Length - tree.Item1; i++)
+                var score = 1;
+                var currentScore = 0;
+                
+                var treesInRow = lines[tree.Item1].Substring(tree.Item2 + 1, lines[tree.Item1].Length - tree.Item2 - 1);
+                //Console.WriteLine($"- row trees: {treesInRow}");
+
+                foreach (var nextTree in treesInRow)
                 {
-                    var nextTree = lines[tree.Item1][i].ToString();
-
-                    if (Int32.Parse(nextTree) < tree.Item3)
+                    currentScore++;
+                    if (Int32.Parse(nextTree.ToString()) >= tree.Item3)
                     {
-                        right++;
-                        continue;
-                    }
-                    else
-                    {
+                        //Console.WriteLine($"-- currentScore: {currentScore}");
                         break;
                     }
                 }
 
-                right = right == 0 ? 1 : right;
+                //Console.WriteLine($"trees right: {treesInRow}, currentScore: {currentScore}");
+                score *= currentScore;
 
-                var left = 0;
+                currentScore = 0;
 
-                for (int i = tree.Item1; i > 0; i--)
+                treesInRow = new string(lines[tree.Item1].Substring(0, tree.Item2).Reverse().ToArray());
+                //Console.WriteLine($"- row trees: {treesInRow}");
+
+                foreach (var nextTree in treesInRow)
                 {
-                    var nextTree = lines[tree.Item1][i].ToString();
-
-                    if (Int32.Parse(nextTree) < tree.Item3)
+                    currentScore++;
+                    if (Int32.Parse(nextTree.ToString()) >= tree.Item3)
                     {
-                        left++;
-                        continue;
-                    }
-                    else
-                    {
+                        //Console.WriteLine($"-- currentScore: {currentScore}");
                         break;
                     }
                 }
 
-                left = left == 0 ? 1 : left;
+                //Console.WriteLine($"trees left: {treesInRow}, currentScore: {currentScore}");
+                score *= currentScore;
 
-                var up = 0;
+                currentScore = 0;
 
-                for (int i = tree.Item2; i < lines.Length - tree.Item1; i++)
+                treesInRow = new string(lines.Skip(tree.Item1 + 1).Select(l => l[tree.Item2]).ToArray());
+                //Console.WriteLine($"- row trees: {treesInRow}");
+
+                foreach (var nextTree in treesInRow)
                 {
-                    var nextTree = lines[i][tree.Item2].ToString();
-
-                    if (Int32.Parse(nextTree) < tree.Item3)
+                    currentScore++;
+                    if (Int32.Parse(nextTree.ToString()) >= tree.Item3)
                     {
-                        up++;
-                        continue;
-                    }
-                    else
-                    {
+                        //Console.WriteLine($"-- currentScore: {currentScore}");
                         break;
                     }
                 }
 
-                up = up == 0 ? 1 : up;
+                //Console.WriteLine($"trees down: {treesInRow}, currentScore: {currentScore}");
+                score *= currentScore;
 
-                var down = 0;
+                currentScore = 0;
 
-                for (int i = tree.Item2; i > 0; i--)
+                treesInRow = new string(lines.Take(tree.Item1).Select(l => l[tree.Item2]).Reverse().ToArray());
+                //Console.WriteLine($"- row trees: {treesInRow}");
+
+                foreach (var nextTree in treesInRow)
                 {
-                    var nextTree = lines[i][tree.Item2].ToString();
-
-                    if (Int32.Parse(nextTree) < tree.Item3)
+                    currentScore++;
+                    if (Int32.Parse(nextTree.ToString()) >= tree.Item3)
                     {
-                        down++;
-                        continue;
-                    }
-                    else
-                    {
+                        //Console.WriteLine($"-- currentScore: {currentScore}");
                         break;
                     }
                 }
 
-                down = down == 0 ? 1 : down;
+                //Console.WriteLine($"trees up: {treesInRow}, currentScore: {currentScore}");
+                score *= currentScore;
 
-                var score = left * right * up * down;
-
-                Console.WriteLine($"row: {tree.Item1}, column: {tree.Item2}, tree height: {tree.Item3}, left: {left}, right: {right}, up: {up}, down: {down}");
-
+                //Console.WriteLine($"score: {score}");
                 if (score > maxScore)
                 {
                     maxScore = score;
                 }
             }
 
-            Console.WriteLine($"maxScore: {maxScore}");
-
             part1 = tallestTrees.Distinct().Where(t => t.Item1 > 0 && t.Item1 < lines.Length - 1 && t.Item2 > 0 && t.Item2 < lines[0].Length - 1).Count() + width * 2 + height * 2 - 4;
+            part2 = maxScore;
 
             Console.WriteLine($"part1: {part1}");
             Console.WriteLine($"part2: {part2}");
