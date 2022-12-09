@@ -11,6 +11,8 @@ namespace AdventOfCode2022.Days
         static int day = 9;
         static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\Input.txt";
         //static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\SampleInput.txt";
+        //static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\SampleInput2.txt";
+
         static string cookiePath = @"D:\Development\AdventOfCode\cookie.txt";
 
         static int part1 = -1;
@@ -43,16 +45,12 @@ namespace AdventOfCode2022.Days
             }
         }
 
-        private void SolveProblem(string[] lines)
+        private int GetTailPositions(string[] lines, int ropeLength)
         {
-            lines = lines.Where(l => !string.IsNullOrWhiteSpace(l)).ToArray();
-            var currentHead = (0, 0);
-            var currentTail = (0, 0);
-            var visitedPositions = new List<(int, int)>();
-            var visitedPositionsLong = new List<(int, int)>();
             var rope = new List<(int, int)>();
+            var tailPositions = new List<(int, int)>();
 
-            for (int i = 0; i < 9; i++)
+            for (int i = 0; i < ropeLength; i++)
             {
                 rope.Add((0, 0));
             }
@@ -62,200 +60,138 @@ namespace AdventOfCode2022.Days
                 var direction = lines[i].Substring(0, lines[i].IndexOf(" "));
                 var steps = Int32.Parse(lines[i].Substring(lines[i].IndexOf(" "), lines[i].Length - lines[i].IndexOf(" ")));
 
+                Console.WriteLine($"=====Direction: {direction}=====");
+
                 for (int j = 0; j < steps; j++)
                 {
-                    if (direction == "U")
+                    for (int k = 0; k < rope.Count; k++)
                     {
-                        currentHead = (currentHead.Item1 + 1, currentHead.Item2);
-
-                        if (Math.Abs(currentHead.Item1 - currentTail.Item1) > 1)
+                        var currentKnot = rope[k];
+                        //Console.WriteLine($"initial knot: {currentKnot.Item1};{currentKnot.Item2}");
+                        if (k == 0)
                         {
-                            currentTail = (currentHead.Item1 - 1, currentTail.Item2);
+                            var row = currentKnot.Item1 + (direction == "U" ? 1 : direction == "D" ? -1 : 0);
+                            var col = currentKnot.Item2 + (direction == "R" ? 1 : direction == "L" ? -1 : 0);
 
-                            if (Math.Abs(currentHead.Item2 - currentTail.Item2) > 0)
+                            currentKnot = (row, col);
+                            Console.WriteLine($"head: {currentKnot.Item1};{currentKnot.Item2}");
+                        }
+                        else
+                        {
+                            var previousKnot = rope[k - 1];
+
+                            // Up
+                            if (previousKnot.Item1 - currentKnot.Item1 > 1)
                             {
-                                currentTail = (currentTail.Item1, currentHead.Item2);
+                                //Console.WriteLine($"knot before: {currentKnot.Item1};{currentKnot.Item2}");
+                                currentKnot = (currentKnot.Item1 + 1, currentKnot.Item2);
+
+                                //Console.WriteLine($"knot mid: {currentKnot.Item1};{currentKnot.Item2}");
+
+                                if (previousKnot.Item2 - currentKnot.Item2 > 1)
+                                {
+                                    currentKnot = (currentKnot.Item1, previousKnot.Item2 - 1);
+                                }
+                                else if (currentKnot.Item2 - previousKnot.Item2 > 1)
+                                {
+                                    currentKnot = (currentKnot.Item1, previousKnot.Item2 + 1);
+                                }
+                                else if (Math.Abs(previousKnot.Item2 - currentKnot.Item2) > 0)
+                                {
+                                    currentKnot = (currentKnot.Item1, previousKnot.Item2);
+                                }
+
+                                //Console.WriteLine($"knot after: {currentKnot.Item1};{currentKnot.Item2}");
                             }
 
-                            if (!visitedPositions.Any(p => p.Item1 == currentTail.Item1 && p.Item2 == currentTail.Item2))
+                            // Down
+                            else if (currentKnot.Item1 - previousKnot.Item1 > 1)
                             {
-                                visitedPositions.Add(currentTail);
+                                currentKnot = (currentKnot.Item1 - 1, currentKnot.Item2);
+
+                                if (previousKnot.Item2 - currentKnot.Item2 > 1)
+                                {
+                                    currentKnot = (currentKnot.Item1, previousKnot.Item2 - 1);
+                                }
+                                else if (currentKnot.Item2 - previousKnot.Item2 > 1)
+                                {
+                                    currentKnot = (currentKnot.Item1, previousKnot.Item2 + 1);
+                                }
+                                else if (Math.Abs(previousKnot.Item2 - currentKnot.Item2) > 0)
+                                {
+                                    currentKnot = (currentKnot.Item1, previousKnot.Item2);
+                                }
+                            }
+
+                            // Left
+                            else if (currentKnot.Item2 - previousKnot.Item2 > 1)
+                            {
+                                currentKnot = (currentKnot.Item1, currentKnot.Item2 - 1);
+
+                                if (previousKnot.Item1 - currentKnot.Item1 > 1)
+                                {
+                                    currentKnot = (previousKnot.Item1 + 1, currentKnot.Item2);
+                                }
+                                else if (currentKnot.Item1 - previousKnot.Item1 > 1)
+                                {
+                                    currentKnot = (previousKnot.Item1 - 1, currentKnot.Item2);
+                                }
+                                else if (Math.Abs(previousKnot.Item1 - currentKnot.Item1) > 0)
+                                {
+                                    currentKnot = (previousKnot.Item1, currentKnot.Item2);
+                                }
+                            }
+
+                            // Right
+                            else if (previousKnot.Item2 - currentKnot.Item2 > 1)
+                            {
+                                //Console.WriteLine($"knot before: {currentKnot.Item1};{currentKnot.Item2}");
+                                currentKnot = (currentKnot.Item1, currentKnot.Item2 + 1);
+
+                                if (previousKnot.Item1 - currentKnot.Item1 > 1)
+                                {
+                                    currentKnot = (previousKnot.Item1 + 1, currentKnot.Item2);
+                                }
+                                else if (currentKnot.Item1 - previousKnot.Item1 > 1)
+                                {
+                                    currentKnot = (previousKnot.Item1 - 1, currentKnot.Item2);
+                                }
+                                else if (Math.Abs(previousKnot.Item1 - currentKnot.Item1) > 0)
+                                {
+                                    currentKnot = (previousKnot.Item1, currentKnot.Item2);
+                                }
+
+                                //Console.WriteLine($"knot after: {currentKnot.Item1};{currentKnot.Item2}");
+                            }
+
+                            if (k == rope.Count - 1 && !tailPositions.Any(t => t.Item1 == currentKnot.Item1 && t.Item2 == currentKnot.Item2))
+                            {
+                                tailPositions.Add(currentKnot);
+
+                                Console.WriteLine($"tailKnot: {currentKnot.Item1};{currentKnot.Item2}");
                             }
                         }
 
-                        var previousKnot = currentHead;
-
-                        for (int k = 0; k < rope.Count; k++)
-                        {
-                            var knot = rope[k];
-                            if (Math.Abs(previousKnot.Item1 - knot.Item1) > 1)
-                            {
-                                knot = (previousKnot.Item1 - 1, knot.Item2);
-
-                                if (Math.Abs(previousKnot.Item2 - knot.Item2) > 0)
-                                {
-                                    knot = (knot.Item1, previousKnot.Item2);
-                                }
-
-                                if (k == rope.Count - 1 && !visitedPositionsLong.Any(p => p.Item1 == knot.Item1 && p.Item2 == knot.Item2))
-                                {
-                                    visitedPositionsLong.Add(knot);
-                                }
-                            }
-
-                            previousKnot = knot;
-                        }
+                        Console.WriteLine($"currentKnot: {currentKnot.Item1};{currentKnot.Item2}");
+                        rope[k] = currentKnot;
                     }
-                    else if (direction == "D")
-                    {
-                        currentHead = (currentHead.Item1 - 1, currentHead.Item2);
-
-                        if (Math.Abs(currentHead.Item1 - currentTail.Item1) > 1)
-                        {
-                            currentTail = (currentHead.Item1 + 1, currentTail.Item2);
-
-                            if (Math.Abs(currentHead.Item2 - currentTail.Item2) > 0)
-                            {
-                                currentTail = (currentTail.Item1, currentHead.Item2);
-                            }
-
-                            if (!visitedPositions.Any(p => p.Item1 == currentTail.Item1 && p.Item2 == currentTail.Item2))
-                            {
-                                visitedPositions.Add(currentTail);
-                            }
-                        }
-
-                        var previousKnot = currentHead;
-
-                        for (int k = 0; k < rope.Count; k++)
-                        {
-                            var knot = rope[k];
-
-                            if (Math.Abs(previousKnot.Item1 - knot.Item1) > 1)
-                            {
-                                knot = (previousKnot.Item1 + 1, knot.Item2);
-
-                                if (Math.Abs(previousKnot.Item2 - knot.Item2) > 0)
-                                {
-                                    knot = (knot.Item1, previousKnot.Item2);
-                                }
-
-                                if (k == rope.Count - 1 && !visitedPositionsLong.Any(p => p.Item1 == knot.Item1 && p.Item2 == knot.Item2))
-                                {
-                                    visitedPositionsLong.Add(knot);
-                                }
-                            }
-
-                            previousKnot = knot;
-                        }
-                    }
-                    else if (direction == "L")
-                    {
-                        currentHead = (currentHead.Item1, currentHead.Item2 - 1);
-
-                        if (Math.Abs(currentHead.Item2 - currentTail.Item2) > 1)
-                        {
-                            currentTail = (currentTail.Item1, currentHead.Item2 + 1);
-
-                            if (Math.Abs(currentHead.Item1 - currentTail.Item1) > 0)
-                            {
-                                currentTail = (currentHead.Item1, currentTail.Item2);
-                            }
-
-                            if (!visitedPositions.Any(p => p.Item1 == currentTail.Item1 && p.Item2 == currentTail.Item2))
-                            {
-                                visitedPositions.Add(currentTail);
-                            }
-                        }
-
-                        var previousKnot = currentHead;
-
-                        for (int k = 0; k < rope.Count; k++)
-                        {
-                            var knot = rope[k];
-
-                            if (Math.Abs(previousKnot.Item2 - knot.Item2) > 1)
-                            {
-                                knot = (knot.Item1, previousKnot.Item2 + 1);
-
-                                if (Math.Abs(previousKnot.Item1 - knot.Item1) > 0)
-                                {
-                                    knot = (previousKnot.Item1, knot.Item2);
-                                }
-
-                                if (k == rope.Count - 1 && !visitedPositionsLong.Any(p => p.Item1 == knot.Item1 && p.Item2 == knot.Item2))
-                                {
-                                    visitedPositionsLong.Add(knot);
-                                }
-                            }
-
-                            previousKnot = knot;
-                        }
-                    }
-                    else if (direction == "R")
-                    {
-                        currentHead = (currentHead.Item1, currentHead.Item2 + 1);
-
-                        if (Math.Abs(currentHead.Item2 - currentTail.Item2) > 1)
-                        {
-                            currentTail = (currentTail.Item1, currentHead.Item2 - 1);
-
-                            if (Math.Abs(currentHead.Item1 - currentTail.Item1) > 0)
-                            {
-                                currentTail = (currentHead.Item1, currentTail.Item2);
-                            }
-
-                            if (!visitedPositions.Any(p => p.Item1 == currentTail.Item1 && p.Item2 == currentTail.Item2))
-                            {
-                                visitedPositions.Add(currentTail);
-                            }
-                        }
-
-                        var previousKnot = currentHead;
-
-                        for (int k = 0; k < rope.Count; k++)
-                        {
-                            var knot = rope[k];
-
-                            if (Math.Abs(previousKnot.Item2 - knot.Item2) > 1)
-                            {
-                                knot = (knot.Item1, previousKnot.Item2 - 1);
-
-                                if (Math.Abs(previousKnot.Item1 - knot.Item1) > 0)
-                                {
-                                    knot = (previousKnot.Item1, knot.Item2);
-                                }
-
-                                if (k == rope.Count - 1 && !visitedPositionsLong.Any(p => p.Item1 == knot.Item1 && p.Item2 == knot.Item2))
-                                {
-                                    visitedPositionsLong.Add(knot);
-                                }
-                            }
-
-                            previousKnot = knot;
-                        }
-                    }
-
-                    //Console.WriteLine($"currentHead row: {currentHead.Item1}," +
-                    //    $"currentHead col: {currentHead.Item2}, " +
-                    //    $"currentTail row: {currentTail.Item1}, " +
-                    //    $"currentTail col: {currentTail.Item2}, " +
-                    //    $"step: {j}, " +
-                    //    $"positionsVisited: {visitedPositions.Count}");
                 }
-
-                Console.WriteLine($"direction: {direction}, " +
-                    $"steps: {steps}, " +
-                    $"currentHead row: {currentHead.Item1}, " +
-                    $"currentHead col: {currentHead.Item2}, " +
-                    $"currentTail row: {currentTail.Item1}, " +
-                    $"currentTail col: {currentTail.Item2}, " +
-                    $"visitedPositions: {visitedPositions.Count}, " +
-                    $"visitedPositionsLong: {visitedPositionsLong.Count}");
             }
 
-            part1 = visitedPositions.Count + 1;
-            part2 = visitedPositionsLong.Count + 1;
+            foreach (var item in tailPositions)
+            {
+                Console.WriteLine($"tailPosition: {item}");
+            }
+
+            return tailPositions.Count;
+        }
+
+        private void SolveProblem(string[] lines)
+        {
+            lines = lines.Where(l => !string.IsNullOrWhiteSpace(l)).ToArray();
+
+            //part1 = GetTailPositions(lines, 2);
+            part2 = GetTailPositions(lines, 10);
 
             Console.WriteLine($"part1: {part1}");
             Console.WriteLine($"part2: {part2}");

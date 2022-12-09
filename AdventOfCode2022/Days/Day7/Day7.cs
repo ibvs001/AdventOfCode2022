@@ -26,8 +26,8 @@ namespace AdventOfCode2022.Days
 
         public void Run(int submitPartNumber = -1)
         {
-            //var cookie = File.ReadAllText(cookiePath);
-            //InputHelper.GetInput(inputPath, year, day, cookie);
+            var cookie = File.ReadAllText(cookiePath);
+            InputHelper.GetInput(inputPath, year, day, cookie);
             string[] lines = File.ReadAllLines(inputPath);
 
             //SolveProblem(lines);
