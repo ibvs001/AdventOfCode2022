@@ -55,8 +55,31 @@ namespace AdventOfCode2022.Days
             var cycles = noops + addx;
             var cycleCounter = 20;
             var crtPixels = new List<string>();
+            var crtRowPixels = string.Empty;
+            var pixelMultiplier = 0;
 
-            for (int i = 0; i < cycles; i++)
+            /*
+            1100110011001100110011001100110011001100
+            1110001110001110001110001110001110001110
+            1111000011110000111100001111000011110000
+            1111100000111110000011111000001111100000
+            1111110000001111110000001111110000001111
+
+            ##..##..##..##..##..##..##..##..##..##..
+            ###...###...###...###...###...###...###.
+            ####....####....####....####....####....
+            #####.....#####.....#####.....#####.....
+            ######......######......######......####
+
+            ##..##..##..##..##..##..##..##..##..##..
+            ###...###...###...###...###...###...###.
+            ####....####....####....####....####....
+            #####.....#####.....#####.....#####.....
+            ######......######......######......####
+            #######.......#######.......#######.....
+            */
+
+            for (int i = 0; i <= cycles; i++)
             {
                 var line = i < newLines.Count ? newLines[i] : string.Empty;
                 if (!string.IsNullOrEmpty(line) && line != "noop" && line.Substring(0, line.IndexOf(" ")) == "addx")
@@ -67,16 +90,21 @@ namespace AdventOfCode2022.Days
                     //Console.WriteLine($"action - current index: {i}, complete index: {action.Item1}, value: {action.Item2}");
                 }
 
-                // Draw
-                if (string.IsNullOrEmpty(line))
+                if (i >= 40 && i % 40 == 0)
                 {
-
+                    pixelMultiplier += 40;
+                    //Console.WriteLine($"row: {crtRowPixels}");
+                    crtPixels.Add(crtRowPixels);
+                    crtRowPixels = string.Empty;
                 }
+
+                var pixelIndex = i - pixelMultiplier;// + (i == 39 ? 1 : 0);
+                crtRowPixels += (x >= pixelIndex - 1 && x <= pixelIndex + 1 ? "#" : ".");
 
                 if (i == cycleCounter - 1)
                 {
                     part1 += (i + 1) * x;
-                    Console.WriteLine($"signal: {i + 1}, strength: {part1}");
+                    //Console.WriteLine($"signal: {i + 1}, strength: {part1}");
                     cycleCounter += 40;
                 }
 
@@ -87,6 +115,11 @@ namespace AdventOfCode2022.Days
                 }
 
                 Console.WriteLine($"cycle: {i + 1}, x: {x}");
+            }
+
+            foreach (var row in crtPixels)
+            {
+                Console.WriteLine($"row: {row}");
             }
 
             Console.WriteLine($"part1: {part1}");
