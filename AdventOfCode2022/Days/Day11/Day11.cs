@@ -12,12 +12,11 @@ namespace AdventOfCode2022.Days
         static int day = 11;
         //static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\Input.txt";
         static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\SampleInput.txt";
-        //static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\SampleInput2.txt";
 
         static string cookiePath = @"D:\Development\AdventOfCode\cookie.txt";
 
-        static int part1 = 0;
-        static int part2 = -1;
+        static long part1 = 0;
+        static long part2 = -1;
 
         public void Run(int submitPartNumber = -1)
         {
@@ -50,14 +49,14 @@ namespace AdventOfCode2022.Days
         {
             lines = lines.Where(l => !string.IsNullOrWhiteSpace(l)).ToArray();
 
-            //part1 = RunRounds(20, lines, 3);
-            part2 = RunRounds(1000, lines, 1);
+            part1 = RunRounds(20, lines, 3);
+            //part2 = RunRounds(1000, lines, 0);
 
             Console.WriteLine($"part1: {part1}");
             Console.WriteLine($"part2: {part2}");
         }
 
-        private int RunRounds(int rounds, string[] lines, decimal worryLevelDivider)
+        private long RunRounds(int rounds, string[] lines, decimal worryLevelDivider)
         {
             var monkeys = new List<List<string>>();
 
@@ -108,24 +107,10 @@ namespace AdventOfCode2022.Days
             }
 
             var sw = new StreamWriter($@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\Part2Output.txt");
-            var increment = 1;
+            var relief = monkeys.Aggregate(1, (seed, monkey) => seed * Int32.Parse(monkey[3]));
 
             for (int i = 1; i <= rounds; i++)
             {
-                // Attempt to reduce level each round to avoid using large numbers.
-                var existsUnderMin = monkeys.Any(m => m[1].Split(",").Any(t => !string.IsNullOrWhiteSpace(t) && Int32.Parse(t) < rounds + increment - 1));
-
-                if (!existsUnderMin)
-                {
-                    for (int j = 0; j < monkeys.Count; j++)
-                    {
-                        var monkey = monkeys[j];
-                        monkeys[j][1] = string.Join(",", monkey[1].Split(",").Where(t => !string.IsNullOrWhiteSpace(t)).Select(t => (Int32.Parse(t) % (rounds + increment)).ToString()));
-                    }
-
-                    increment++;
-                }
-
                 for (int j = 0; j < monkeys.Count; j++)
                 {
                     var monkey = monkeys[j];
@@ -158,11 +143,13 @@ namespace AdventOfCode2022.Days
                             worryLevel = GetValue(operationP1, currentLevel) + GetValue(operationP2, currentLevel);
                         }
 
-                        var levelToPass = Math.Floor(Math.Abs(worryLevel) / worryLevelDivider);
+                        var levelToPass = worryLevelDivider == relief ? Math.Floor(Math.Abs(worryLevel) / worryLevelDivider) : worryLevel % relief;
+
+                        //levelToPass = levelToPass > increment ? levelToPass % increment : levelToPass;
 
                         //Console.WriteLine($"round: {i}, monkey: {monkey[0]}, item: {currentLevel}, levelToPass: {levelToPass}, worryLevel: {worryLevel}");
 
-                        if (levelToPass % Int64.Parse(monkey[3]) == 0)
+                        if (levelToPass % Int32.Parse(monkey[3]) == 0)
                         {
                             //Console.WriteLine($"pass to monkey: {monkey[4]}, levelToPass: {levelToPass}");
                             monkeys[Int32.Parse(monkey[4])][1] += (string.IsNullOrWhiteSpace(monkeys[Int32.Parse(monkey[4])][1]) ? string.Empty : ",") + levelToPass;
@@ -191,7 +178,7 @@ namespace AdventOfCode2022.Days
 
             sw.Close();
 
-            return monkeys.Select(m => Int32.Parse(m[6])).OrderByDescending(m => m).Take(2).Aggregate((a, x) => a * x);
+            return monkeys.Select(m => Int64.Parse(m[6])).OrderByDescending(m => m).Take(2).Aggregate((a, x) => a * x);
         }
 
         private int GetValue(string operationValue, int currentValue)
