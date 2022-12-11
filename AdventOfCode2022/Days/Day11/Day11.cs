@@ -10,13 +10,13 @@ namespace AdventOfCode2022.Days
     {
         static int year = 2022;
         static int day = 11;
-        //static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\Input.txt";
-        static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\SampleInput.txt";
+        static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\Input.txt";
+        //static string inputPath = $@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\SampleInput.txt";
 
         static string cookiePath = @"D:\Development\AdventOfCode\cookie.txt";
 
         static long part1 = 0;
-        static long part2 = -1;
+        static long part2 = 0;
 
         public void Run(int submitPartNumber = -1)
         {
@@ -50,7 +50,7 @@ namespace AdventOfCode2022.Days
             lines = lines.Where(l => !string.IsNullOrWhiteSpace(l)).ToArray();
 
             part1 = RunRounds(20, lines, 3);
-            //part2 = RunRounds(1000, lines, 0);
+            part2 = RunRounds(10000, lines, 1);
 
             Console.WriteLine($"part1: {part1}");
             Console.WriteLine($"part2: {part2}");
@@ -106,8 +106,7 @@ namespace AdventOfCode2022.Days
                 }
             }
 
-            var sw = new StreamWriter($@"D:\Development\AdventOfCode\AdventOfCode{year}\AdventOfCode{year}\Days\Day{day}\Part2Output.txt");
-            var relief = monkeys.Aggregate(1, (seed, monkey) => seed * Int32.Parse(monkey[3]));
+            var diviser = monkeys.Aggregate(1, (seed, monkey) => seed * Int32.Parse(monkey[3]));
 
             for (int i = 1; i <= rounds; i++)
             {
@@ -128,10 +127,8 @@ namespace AdventOfCode2022.Days
 
                         monkeys[j][6] = (Int32.Parse(monkeys[j][6]) + 1).ToString();
 
-                        int currentLevel = Int32.Parse(items[k].Trim());
-
-                        //currentLevel = currentLevel > 1000 ? currentLevel / 100 : currentLevel;
-                        int worryLevel = 0;
+                        long currentLevel = Int64.Parse(items[k].Trim());
+                        long worryLevel = 0;
                         //Console.WriteLine($"currentLevel: {currentLevel}");
 
                         if (operationCalc.Contains("*"))
@@ -143,13 +140,11 @@ namespace AdventOfCode2022.Days
                             worryLevel = GetValue(operationP1, currentLevel) + GetValue(operationP2, currentLevel);
                         }
 
-                        var levelToPass = worryLevelDivider == relief ? Math.Floor(Math.Abs(worryLevel) / worryLevelDivider) : worryLevel % relief;
-
-                        //levelToPass = levelToPass > increment ? levelToPass % increment : levelToPass;
+                        var levelToPass = worryLevelDivider == 3 ? Math.Floor(Math.Abs(worryLevel) / worryLevelDivider) : worryLevel % diviser;
 
                         //Console.WriteLine($"round: {i}, monkey: {monkey[0]}, item: {currentLevel}, levelToPass: {levelToPass}, worryLevel: {worryLevel}");
 
-                        if (levelToPass % Int32.Parse(monkey[3]) == 0)
+                        if (levelToPass % Int64.Parse(monkey[3]) == 0)
                         {
                             //Console.WriteLine($"pass to monkey: {monkey[4]}, levelToPass: {levelToPass}");
                             monkeys[Int32.Parse(monkey[4])][1] += (string.IsNullOrWhiteSpace(monkeys[Int32.Parse(monkey[4])][1]) ? string.Empty : ",") + levelToPass;
@@ -170,20 +165,20 @@ namespace AdventOfCode2022.Days
 
                 foreach (var monkey in monkeys)
                 {
-                    var response = $"round: {i}, monkey: {monkey[0]}, test: {monkey[3]}, items: {string.Join(',', monkey[1])}, inspected: {monkey[6]}";
-                    sw.WriteLine(response);
-                    Console.WriteLine(response);
+                    if (i % 1000 == 0 || i == 20)
+                    {
+                        var response = $"round: {i}, monkey: {monkey[0]}, test: {monkey[3]}, items: {string.Join(',', monkey[1])}, inspected: {monkey[6]}";
+                        Console.WriteLine(response);
+                    }
                 }
             }
-
-            sw.Close();
 
             return monkeys.Select(m => Int64.Parse(m[6])).OrderByDescending(m => m).Take(2).Aggregate((a, x) => a * x);
         }
 
-        private int GetValue(string operationValue, int currentValue)
+        private long GetValue(string operationValue, long currentValue)
         {
-            return Math.Abs(Int32.Parse(operationValue.Replace("old", currentValue.ToString())));
+            return Math.Abs(Int64.Parse(operationValue.Replace("old", currentValue.ToString())));
         }
     }
 }
