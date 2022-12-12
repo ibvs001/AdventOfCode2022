@@ -1,4 +1,4 @@
 ﻿using AdventOfCode2022.Days;
 
-var day = new Day11();
+var day = new Day12();
 day.Run();
